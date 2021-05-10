@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar, Button } from 'react-native';
 import algoliasearch from 'algoliasearch/reactnative';
-import { InstantSearch, } from 'react-instantsearch-native';
+import { InstantSearch, connectRefinementList } from 'react-instantsearch-native';
 import SearchBox from './src/SearchBox';
 import InfiniteHits from './src/InfiniteHits';
 import RefinementList from './src/RefinementList';
@@ -22,6 +22,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 });
+
+const VirtualRefinementList = connectRefinementList(() => null);
 
 class App extends React.Component {
   root = {
@@ -62,6 +64,7 @@ class App extends React.Component {
             searchState={searchState}
             onSearchStateChange={this.onSearchStateChange}
           >
+            <VirtualRefinementList attribute="categories" />
              <Filters
               isModalOpen={isModalOpen}
               searchClient={searchClient}
