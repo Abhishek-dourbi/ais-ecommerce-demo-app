@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
 import algoliasearch from 'algoliasearch/reactnative';
-import { InstantSearch } from 'react-instantsearch-native';
+import { InstantSearch, } from 'react-instantsearch-native';
 import SearchBox from './src/SearchBox';
 import InfiniteHits from './src/InfiniteHits';
+import RefinementList from './src/RefinementList';
 
 const searchClient = algoliasearch(
   'B1G2GM9NG0',
@@ -42,6 +43,7 @@ class App extends React.Component {
             root={this.root}
           >
             <SearchBox />
+            <RefinementList attribute="brand" limit={5} />
             <InfiniteHits />
           </InstantSearch>
         </View>
