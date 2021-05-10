@@ -4,8 +4,38 @@ import PropTypes from 'prop-types';
 import { connectRefinementList } from 'react-instantsearch-native';
 
 const styles = StyleSheet.create({
-  // fill with styles on the next step
-});
+    container: {
+      padding: 10,
+      backgroundColor: '#FFFFFF',
+    },
+    title: {
+      alignItems: 'center',
+    },
+    titleText: {
+      fontSize: 20,
+    },
+    list: {
+      marginTop: 20,
+    },
+    item: {
+      paddingVertical: 10,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      borderBottomWidth: 1,
+      alignItems: 'center',
+    },
+    itemCount: {
+      backgroundColor: '#252b33',
+      borderRadius: 25,
+      paddingVertical: 5,
+      paddingHorizontal: 7.5,
+    },
+    itemCountText: {
+      color: '#FFFFFF',
+      fontWeight: '800',
+    },
+  });
+  
 
 const RefinementList = ({ items, refine }) => (
   <View style={styles.container}>
