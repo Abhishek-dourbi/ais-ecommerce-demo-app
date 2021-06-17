@@ -1,16 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, StatusBar, Button } from 'react-native';
-import algoliasearch from 'algoliasearch/reactnative';
+import { StyleSheet, View, SafeAreaView, StatusBar, Button, Text, TextInput, TouchableOpacity } from 'react-native';
 import { InstantSearch, connectRefinementList } from 'react-instantsearch-native';
 import SearchBox from './src/SearchBox';
 import InfiniteHits from './src/InfiniteHits';
 import RefinementList from './src/RefinementList';
 import Filters from './src/Filters';
-
-const searchClient = algoliasearch(
-  'B1G2GM9NG0',
-  'aadef574be1f9252bb48d4ea09b5cfe5'
-);
+import { getRecentSearches, getSuggestions, setRecentSearches } from './src/Algolia';
 
 const styles = StyleSheet.create({
   safe: {
@@ -19,6 +14,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },
 });
@@ -38,7 +36,34 @@ class App extends React.Component {
   state = {
     isModalOpen: false,
     searchState: {},
+    hits: [],
+    recentSearches: []
   };
+
+  async componentDidMount() {
+    await this.fetchRecentSearches();
+  }
+
+  fetchRecentSearches = async () => {
+    const recentSearches = await getRecentSearches("users1");
+    this.setState({
+      recentSearches
+    })
+  }
+
+  onChangeText = async (value) => {
+    const hits = await getSuggestions(value);
+    this.setState({
+      hits
+    })
+  }
+
+  onPress = async(query) => {
+    const recentSearches = await setRecentSearches(query, "users1");
+    this.setState({
+      recentSearches
+    })
+  }
 
   toggleModal = () =>
     this.setState(({ isModalOpen }) => ({
@@ -57,30 +82,58 @@ class App extends React.Component {
       <SafeAreaView style={styles.safe}>
         <StatusBar barStyle="light-content" />
         <View style={styles.container}>
-          <InstantSearch
-            searchClient={searchClient}
-            indexName="demo_ecommerce"
-            root={this.root}
-            searchState={searchState}
-            onSearchStateChange={this.onSearchStateChange}
-          >
-            <VirtualRefinementList attribute="categories" />
-             <Filters
-              isModalOpen={isModalOpen}
-              searchClient={searchClient}
-              searchState={searchState}
-              toggleModal={this.toggleModal}
-              onSearchStateChange={this.onSearchStateChange}
-            />
-            <SearchBox />
-            <Button
-              title="Filters"
-              color="#252b33"
-              onPress={this.toggleModal}
-            />
-            {/* <RefinementList attribute="brand" limit={5} /> */}
-            <InfiniteHits />
-          </InstantSearch>
+          <TextInput 
+            onChangeText={this.onChangeText} 
+            style={{
+              width: '100%', 
+              height: 50, 
+              color: '#000',
+              fontSize: 18,
+              borderColor: '#000',
+              borderWidth: 2,
+              borderTopLeftRadius: 10,
+              borderTopRightRadius: 10,
+              padding: 10
+            }}
+            placeholder='Search..'
+          />
+          <View style={{width: '100%', backgroundColor: 'grey', borderBottomLeftRadius: 10, borderBottomRightRadius: 10,}}>
+            {this.state.recentSearches.length > 0 &&
+              <View style={{padding: 10}}>
+                <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
+                  Recent Searches
+                </Text>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                {
+                  this.state.recentSearches.map(ele => {
+                    return (
+                      <Text style={{color: 'yellow', textDecorationLine: 'underline'}}>
+                        {ele}
+                      </Text>
+                    )
+                  })
+                }
+                </View>
+              </View>
+            }
+            {
+              this.state.hits.map(ele => {
+                return (
+                  <TouchableOpacity 
+                    style={{
+                      padding: 10, 
+                      borderBottomColor: '#fff', 
+                      borderBottomWidth: 2
+                    }} 
+                    onPress={() => this.onPress(ele.brand)}>
+                    <Text style={{fontSize: 18}}>
+                      {ele.brand}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })
+            }
+          </View>
         </View>
       </SafeAreaView>
     );

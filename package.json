@@ -10,7 +10,10 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@algolia/autocomplete-js": "^1.1.0",
+    "@algolia/autocomplete-theme-classic": "^1.1.0",
     "algoliasearch": "3.32.1",
+    "axios": "^0.21.1",
     "expo": "^41.0.0",
     "prop-types": "15.7.2",
     "react": "16.13.1",
