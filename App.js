@@ -103,11 +103,11 @@ class App extends React.Component {
                 <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
                   Recent Searches
                 </Text>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
                 {
                   this.state.recentSearches.map(ele => {
                     return (
-                      <Text style={{color: 'yellow', textDecorationLine: 'underline'}}>
+                      <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
                         {ele}
                       </Text>
                     )

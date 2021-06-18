@@ -30,17 +30,19 @@ export async function getSuggestions(query) {
 }
 
 export async function setRecentSearches(query, userID) {
+    let searches  = [];
     try {
         const res = await index.getObject(userID);
-        let searches = [...res.searches, query];
+        searches = [...res.searches, query];
         searches = searches.length > 5 ? searches.slice(1) : searches;
         const data = [{ objectID: userID, searches }];
-        const result = await index.saveObjects(data);
+        await index.saveObjects(data);
         return searches;
       } catch(e) {
         console.log(e);
-        const data = [{ objectID: userID, searches: [query] }];
-        const result = await index.saveObjects(data);
+        searches = [query];
+        const data = [{ objectID: userID, searches }];
+        await index.saveObjects(data);
         return searches;
       }
 }
