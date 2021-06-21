@@ -5,7 +5,7 @@ import SearchBox from './src/SearchBox';
 import InfiniteHits from './src/InfiniteHits';
 import RefinementList from './src/RefinementList';
 import Filters from './src/Filters';
-import { getRecentSearches, getSuggestions, setRecentSearches } from './src/Algolia';
+import { getRecentSearches, getSuggestions, getTopSearches, setRecentSearches } from './src/Algolia';
 
 const styles = StyleSheet.create({
   safe: {
@@ -37,17 +37,26 @@ class App extends React.Component {
     isModalOpen: false,
     searchState: {},
     hits: [],
-    recentSearches: []
+    recentSearches: [],
+    topSearches: []
   };
 
   async componentDidMount() {
     await this.fetchRecentSearches();
+    await this.fetchTopSearches();
+  }
+
+  fetchTopSearches = async() => {
+    const topSearches = await getTopSearches();
+    this.setState({
+      topSearches: topSearches || []
+    });
   }
 
   fetchRecentSearches = async () => {
     const recentSearches = await getRecentSearches("users1");
     this.setState({
-      recentSearches
+      recentSearches: recentSearches || []
     })
   }
 
@@ -98,6 +107,24 @@ class App extends React.Component {
             placeholder='Search..'
           />
           <View style={{width: '100%', backgroundColor: 'grey', borderBottomLeftRadius: 10, borderBottomRightRadius: 10,}}>
+            {this.state.topSearches.length > 0 &&
+              <View style={{padding: 10}}>
+                <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
+                  Top Searches
+                </Text>
+                <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                {
+                  this.state.topSearches.map(ele => {
+                    return (
+                      <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
+                        {ele.search && ele.search}
+                      </Text>
+                    )
+                  })
+                }
+                </View>
+              </View>
+            }
             {this.state.recentSearches.length > 0 &&
               <View style={{padding: 10}}>
                 <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
@@ -125,9 +152,9 @@ class App extends React.Component {
                       borderBottomColor: '#fff', 
                       borderBottomWidth: 2
                     }} 
-                    onPress={() => this.onPress(ele.brand)}>
+                    onPress={() => this.onPress(ele.query)}>
                     <Text style={{fontSize: 18}}>
-                      {ele.brand}
+                      {ele.query}
                     </Text>
                   </TouchableOpacity>
                 )
