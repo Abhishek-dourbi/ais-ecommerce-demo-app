@@ -5,7 +5,7 @@ import SearchBox from './src/SearchBox';
 import InfiniteHits from './src/InfiniteHits';
 import RefinementList from './src/RefinementList';
 import Filters from './src/Filters';
-import { getRecentSearches, getSuggestions, getTopSearches, setRecentSearches } from './src/Algolia';
+import { algoliaSDK, getRecentSearches, getSuggestions, getTopSearches, setRecentSearches } from './src/Algolia';
 
 const styles = StyleSheet.create({
   safe: {
@@ -23,6 +23,25 @@ const styles = StyleSheet.create({
 
 const VirtualRefinementList = connectRefinementList(() => null);
 
+const genders = [
+  {
+    label: 'All',
+    value: 'all'
+  },
+  {
+    label: 'Women',
+    value: 'women'
+  },
+  {
+    label: 'Men',
+    value: 'men'
+  },
+  {
+    label: 'Kids',
+    value: 'kids'
+  }
+];
+
 class App extends React.Component {
   root = {
     Root: View,
@@ -38,10 +57,12 @@ class App extends React.Component {
     searchState: {},
     hits: [],
     recentSearches: [],
-    topSearches: []
+    topSearches: [],
+    selectedGender: 'women',
   };
 
   async componentDidMount() {
+    algoliaSDK.setIndex();
     await this.fetchRecentSearches();
     await this.fetchTopSearches();
   }
@@ -84,13 +105,45 @@ class App extends React.Component {
       searchState,
     }));
 
+  onGenderPress = gender => {
+    this.setState({
+      selectedGender: gender
+    })
+  }
+
   render() {
-    const { isModalOpen, searchState } = this.state;
+    const { isModalOpen, searchState, selectedGender } = this.state;
 
     return (
       <SafeAreaView style={styles.safe}>
         <StatusBar barStyle="light-content" />
         <View style={styles.container}>
+          <View style={{
+            flexDirection: 'row',
+            alignSelf: 'flex-start',
+            marginBottom: 20
+          }}>
+          {
+            genders.map(({label, value}) => {
+              return (
+                <TouchableOpacity onPress={() => this.onGenderPress(value)} style={{
+                  backgroundColor: selectedGender === value ? 'grey' : 'white',
+                  borderColor: 'black',
+                  borderWidth: 2,
+                  marginRight: 10,
+                  borderRadius: 10,
+                  padding: 10
+                }}>
+                  <Text style={{
+                    color: selectedGender === value ? 'white' : 'black'
+                  }}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })
+          }
+          </View>
           <TextInput 
             onChangeText={this.onChangeText} 
             style={{

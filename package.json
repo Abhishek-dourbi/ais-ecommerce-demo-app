@@ -10,6 +10,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@6thstreetdotcom/algolia-sdk": "^1.8.3-beta.1",
     "@algolia/autocomplete-js": "^1.1.0",
     "@algolia/autocomplete-theme-classic": "^1.1.0",
     "algoliasearch": "3.32.1",

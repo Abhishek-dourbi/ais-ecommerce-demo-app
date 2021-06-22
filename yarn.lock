@@ -2,6 +2,16 @@
 # yarn lockfile v1
 
 
+"@6thstreetdotcom/algolia-sdk@^1.8.3-beta.1":
+  version "1.8.3-beta.1"
+  resolved "https://registry.yarnpkg.com/@6thstreetdotcom/algolia-sdk/-/algolia-sdk-1.8.3-beta.1.tgz#47e21d25ba7b7373c054844b2310e8e01a311e43"
+  integrity sha512-0yQ4uGe6Q6U1Do5cKFY+aVn8Y8Lv/JEwM8zmb6wLU3eU38nAJp0EvEYMGaK11Lg9vGTXvD4y1lLhZhob4zqHhQ==
+  dependencies:
+    algoliasearch "^3.35.1"
+    i18n-js "^3.5.1"
+    node-fetch "^2.6.0"
+    url-parse "^1.4.7"
+
 "@algolia/autocomplete-core@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@algolia/autocomplete-core/-/autocomplete-core-1.1.0.tgz#774ab85c1ad8f0b64db5b1d44bb3ad8d65553cc5"
@@ -3084,6 +3094,27 @@ algoliasearch@3.32.1:
     "@algolia/requester-common" "4.9.1"
     "@algolia/requester-node-http" "4.9.1"
     "@algolia/transporter" "4.9.1"
+
+algoliasearch@^3.35.1:
+  version "3.35.1"
+  resolved "https://registry.yarnpkg.com/algoliasearch/-/algoliasearch-3.35.1.tgz#297d15f534a3507cab2f5dfb996019cac7568f0c"
+  integrity sha512-K4yKVhaHkXfJ/xcUnil04xiSrB8B8yHZoFEhWNpXg23eiCnqvTZw1tn/SqvdsANlYHLJlKl0qi3I/Q2Sqo7LwQ==
+  dependencies:
+    agentkeepalive "^2.2.0"
+    debug "^2.6.9"
+    envify "^4.0.0"
+    es6-promise "^4.1.0"
+    events "^1.1.0"
+    foreach "^2.0.5"
+    global "^4.3.2"
+    inherits "^2.0.1"
+    isarray "^2.0.1"
+    load-script "^1.0.0"
+    object-keys "^1.0.11"
+    querystring-es3 "^0.2.1"
+    reduce "^1.0.1"
+    semver "^5.1.0"
+    tunnel-agent "^0.6.0"
 
 alphanum-sort@^1.0.0:
   version "1.0.2"
@@ -7571,6 +7602,11 @@ humanize-ms@^1.2.1:
   integrity sha1-xG4xWaKT9riW2ikxbYtv6Lt5u+0=
   dependencies:
     ms "^2.0.0"
+
+i18n-js@^3.5.1:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.8.0.tgz#b8fd6b12e1d88cb71f9806c29bca7c31c012e504"
+  integrity sha512-hDsGgPuvw/2P+lXSbOafAwspK8Ste8YrwuuUg17W3wEcO1JkQxBlPgsN1t2+852nTnz4YSYTjZc/1nAA2PC/nw==
 
 iconv-lite@0.4.23:
   version "0.4.23"
@@ -13564,7 +13600,7 @@ url-parse-lax@^3.0.0:
   dependencies:
     prepend-http "^2.0.0"
 
-url-parse@^1.4.3, url-parse@^1.4.4:
+url-parse@^1.4.3, url-parse@^1.4.4, url-parse@^1.4.7:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.5.1.tgz#d5fa9890af8a5e1f274a2c98376510f6425f6e3b"
   integrity sha512-HOfCOUJt7iSYzEx/UqgtwKRMC6EU91NFhsCHMv9oM03VJcVo2Qrp8T8kI9D7amFf1cu+/3CEhgb3rF9zL7k85Q==

@@ -1,6 +1,7 @@
 import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js';
 import axios from 'axios';
 import algoliasearch from 'algoliasearch/reactnative';
+import AlgoliaSDK from '@6thstreetdotcom/algolia-sdk';
 
 const APPLICATION_ID = "testingYRFDV96GMU";
 const API_KEY = "13e0ed6aa0401c8eb3b7c08c72d90c20";
@@ -73,3 +74,34 @@ export async function getTopSearches() {
     console.log(e.response);
 } 
 }
+
+
+export const algoliaSDK = {
+  init: (appID, adminKey) => {
+    AlgoliaSDK.init(appID, adminKey);
+  },
+
+  setIndex: () => {
+    AlgoliaSDK.setIndex('en-ae', 'staging');
+  },
+
+  getPLP: async (params = {}, options = {}) => {
+    const queryParams = {
+      ...params,
+      locale: 'en-ae'
+    };
+    const tag = ['mobile', 'PLP'];
+    const url = queryString(queryParams);
+
+    const res = await AlgoliaSDK.getPLP(`/?${url}`, options, tag);
+
+    return res;
+  },
+
+  search: AlgoliaSDK.search,
+
+  getClient: () => AlgoliaSDK.client,
+  getIndex: () => AlgoliaSDK.index
+};
+
+algoliaSDK.init(APPLICATION_ID, API_KEY);
