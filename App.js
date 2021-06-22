@@ -49,7 +49,7 @@ class App extends React.Component {
   fetchTopSearches = async() => {
     const topSearches = await getTopSearches();
     this.setState({
-      topSearches: topSearches || []
+      topSearches: topSearches.filter(ele => ele !== "") || []
     });
   }
 
@@ -63,7 +63,7 @@ class App extends React.Component {
   onChangeText = async (value) => {
     const hits = await getSuggestions(value);
     this.setState({
-      hits
+      hits: hits || []
     })
   }
 
@@ -117,7 +117,7 @@ class App extends React.Component {
                   this.state.topSearches.map(ele => {
                     return (
                       <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
-                        {ele.search && ele.search}
+                        {ele.search}
                       </Text>
                     )
                   })
@@ -150,11 +150,16 @@ class App extends React.Component {
                     style={{
                       padding: 10, 
                       borderBottomColor: '#fff', 
-                      borderBottomWidth: 2
+                      borderBottomWidth: 2,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between'
                     }} 
-                    onPress={() => this.onPress(ele.query)}>
+                    onPress={() => {}}>
                     <Text style={{fontSize: 18}}>
                       {ele.query}
+                    </Text>
+                    <Text>
+                      {ele.popularity}
                     </Text>
                   </TouchableOpacity>
                 )

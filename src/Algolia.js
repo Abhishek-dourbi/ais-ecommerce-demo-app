@@ -2,10 +2,10 @@ import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js';
 import axios from 'axios';
 import algoliasearch from 'algoliasearch/reactnative';
 
-const APPLICATION_ID = "826IK76UYZ";
-const API_KEY = "301b098906978cde88da93cc688687c2";
-const indexName = "demo_ecommerce_query_suggestions";
-const sourceIndexName = "demo_ecommerce";
+const APPLICATION_ID = "testingYRFDV96GMU";
+const API_KEY = "13e0ed6aa0401c8eb3b7c08c72d90c20";
+const indexName = "stage_magento_english_products_query_suggestions";
+const sourceIndexName = "stage_magento_english_products";
 
 const searchClient = algoliasearch(
   APPLICATION_ID,
@@ -24,7 +24,7 @@ export async function getSuggestions(query) {
             "X-Algolia-Application-Id": APPLICATION_ID,
           }, 
         })
-        // console.log(res.data.hits);
+        console.log(res);
         return res.data.hits;
     } catch(e) {
         console.log(e);
