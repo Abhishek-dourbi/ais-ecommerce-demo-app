@@ -2,6 +2,7 @@ import { autocomplete, getAlgoliaResults } from '@algolia/autocomplete-js';
 import axios from 'axios';
 import algoliasearch from 'algoliasearch/reactnative';
 import AlgoliaSDK from '@6thstreetdotcom/algolia-sdk';
+import { queryString } from './utils';
 
 const APPLICATION_ID = "testingYRFDV96GMU";
 const API_KEY = "13e0ed6aa0401c8eb3b7c08c72d90c20";
@@ -13,20 +14,18 @@ const searchClient = algoliasearch(
   API_KEY
 );
 
-const index = searchClient.initIndex(sourceIndexName);
+const index = searchClient.initIndex(indexName);
 
-export async function getSuggestions(query) {
+export async function getSuggestions(query, gender) {
     try {
-        const res = await axios.post(`https://${APPLICATION_ID}-dsn.algolia.net/1/indexes/${indexName}/query`, {
-          params: `query=${query}&hitsPerPage=5`
-        }, {
-          headers: {
-            "X-Algolia-API-Key": API_KEY,
-            "X-Algolia-Application-Id": APPLICATION_ID,
-          }, 
+        const res = await index.search(query, {
+          hitsPerPage: 5,
+          facetFilters: [
+            `stage_magento_english_products.facets.exact_matches.gender.value: ${gender}`
+          ]
         })
         console.log(res);
-        return res.data.hits;
+        return res.hits;
     } catch(e) {
         console.log(e);
     }
