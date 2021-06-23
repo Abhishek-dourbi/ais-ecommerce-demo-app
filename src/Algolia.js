@@ -6,8 +6,8 @@ import { queryString } from './utils';
 
 const APPLICATION_ID = "testingYRFDV96GMU";
 const API_KEY = "13e0ed6aa0401c8eb3b7c08c72d90c20";
-const indexName = "stage_magento_english_products_query_suggestions";
-const sourceIndexName = "stage_magento_english_products";
+export const indexName = "stage_magento_english_products_query_suggestions";
+export const sourceIndexName = "stage_magento_english_products";
 
 const searchClient = algoliasearch(
   APPLICATION_ID,

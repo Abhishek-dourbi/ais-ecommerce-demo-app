@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar, Button, Text, TextInput, TouchableOpacity } from 'react-native';
-import { algoliaSDK, getRecentSearches, getSuggestions, getTopSearches, setRecentSearches } from '../Algolia';
+import { algoliaSDK, getRecentSearches, getSuggestions, getTopSearches, setRecentSearches, sourceIndexName } from '../Algolia';
 
 const genders = [
     {
@@ -102,14 +102,19 @@ class Home extends React.Component {
         }
     }
 
-    onSuggestionPress = value => {
-        const query = {
-            q: value,
+    onSuggestionPress = ({query, ...rest}) => {
+        const brand_name = rest[sourceIndexName].facets.exact_matches.brand_name[0].value;
+        
+        let params = {
+            q: query,
             ["categories.level0"]: this.state.selectedGender
         };
+        if(query.toUpperCase().includes(brand_name.toUpperCase())) {
+            params = {...params, brand_name};
+        }        
         this.props.navigation.navigate('PLP', {
-            params: query,
-            title: value
+            params,
+            title: query
         })
     }
 
@@ -217,12 +222,12 @@ class Home extends React.Component {
                             flexDirection: 'row',
                             justifyContent: 'space-between'
                         }} 
-                        onPress={() => this.onSuggestionPress(ele.query)}>
+                        onPress={() => this.onSuggestionPress(ele)}>
                             <Text style={{fontSize: 18}}>
                                 {ele.query}
                             </Text>
                             <Text>
-                                {ele.popularity}
+                                {ele[sourceIndexName].exact_nb_hits}
                             </Text>
                         </TouchableOpacity>
                     )
