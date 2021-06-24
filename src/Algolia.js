@@ -59,7 +59,7 @@ export async function getRecentSearches(userID) {
 
 export async function getTopSearches() {
   try {
-    const res = await axios.get(`https://analytics.algolia.com/2/searches?index=${sourceIndexName}&limit=6`, {
+    const res = await axios.get(`https://analytics.algolia.com/2/searches?index=${sourceIndexName}&limit=5&tags=mobile AND Search`, {
       headers: {
         "X-Algolia-API-Key": API_KEY,
         "X-Algolia-Application-Id": APPLICATION_ID,
