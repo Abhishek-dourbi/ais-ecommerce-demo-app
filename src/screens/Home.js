@@ -107,11 +107,13 @@ class Home extends React.Component {
         
         let params = {
             q: query,
-            ["categories.level0"]: this.state.selectedGender
         };
         if(query.toUpperCase().includes(brand_name.toUpperCase())) {
             params = {...params, brand_name};
-        }        
+        }
+        if(this.state.selectedGender !== "all") {
+            params = {...params, ["categories.level0"]: this.state.selectedGender};
+        }
         this.props.navigation.navigate('PLP', {
             params,
             title: query
