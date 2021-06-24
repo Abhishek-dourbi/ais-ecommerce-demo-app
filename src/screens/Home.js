@@ -2,24 +2,24 @@ import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar, Button, Text, TextInput, TouchableOpacity } from 'react-native';
 import { algoliaSDK, getRecentSearches, getSuggestions, getTopSearches, setRecentSearches, sourceIndexName } from '../Algolia';
 
-const genders = [
-    {
+const genders = {
+    'all': {
       label: 'All',
       value: 'all'
     },
-    {
+    'women': {
       label: 'Women',
       value: 'women'
     },
-    {
+    'men': {
       label: 'Men',
       value: 'men'
     },
-    {
+    'kids': {
       label: 'Kids',
       value: 'kids'
     }
-];
+};
 
 const styles = StyleSheet.create({
     safe: {
@@ -66,7 +66,7 @@ class Home extends React.Component {
     }
 
     onChangeText = async (value) => {
-        const hits = await getSuggestions(value, this.state.selectedGender === "all" ? '' : this.state.selectedGender);
+        const hits = await getSuggestions(this.state.selectedGender === 'all' ? value : `${genders[this.state.selectedGender].value} ${value}`);
         this.setState({
             value,
             hits: hits || []
@@ -119,13 +119,19 @@ class Home extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if(prevState.selectedGender !== this.state.selectedGender) {
+        if(prevState.selectedGender !== this.state.selectedGender && this.state.value) {
             this.onChangeText(this.state.value);
         }
     }
 
+    fomatQuery = (query) => {
+        if(this.state.selectedGender === "all") return query;
+        let regex = new RegExp("\\b" + this.state.selectedGender + "\\b");
+        return query.replace(regex, "").replace(/^\s+|\s+$/g, "").replace(/\s+/g, " ");
+    }
+
     render() {
-        const { isModalOpen, searchState, selectedGender } = this.state;
+        const { isModalOpen, searchState, selectedGender } = this.state;    
 
         return (
             <SafeAreaView style={styles.safe}>
@@ -137,7 +143,7 @@ class Home extends React.Component {
                         marginBottom: 20
                     }}>
                     {
-                        genders.map(({label, value}) => {
+                        Object.values(genders).map(({label, value}) => {
                             return (
                                 <TouchableOpacity onPress={() => this.onGenderPress(value)} style={{
                                     backgroundColor: selectedGender === value ? 'grey' : 'white',
@@ -224,7 +230,7 @@ class Home extends React.Component {
                                 }} 
                                 onPress={() => this.onSuggestionPress(ele)}>
                                     <Text style={{fontSize: 18}}>
-                                        {ele.query}
+                                        {this.fomatQuery(ele.query)}
                                     </Text>
                                     <Text>
                                         {ele[sourceIndexName].exact_nb_hits}

@@ -16,13 +16,11 @@ const searchClient = algoliasearch(
 
 const index = searchClient.initIndex(indexName);
 
-export async function getSuggestions(query, gender) {
+export async function getSuggestions(query) {
+  console.log(query);
     try {
         const res = await index.search(query, {
           hitsPerPage: 5,
-          facetFilters: [
-            `stage_magento_english_products.facets.exact_matches.gender.value: ${gender}`
-          ]
         })
         console.log(res);
         return res.hits;
