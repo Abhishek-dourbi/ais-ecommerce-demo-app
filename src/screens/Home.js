@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView, StatusBar, Button, Text, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, SafeAreaView, StatusBar, Button, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { algoliaSDK, getRecentSearches, getSuggestions, getTopSearches, setRecentSearches, sourceIndexName } from '../Algolia';
 
 const genders = {
@@ -43,7 +43,8 @@ class Home extends React.Component {
         recentSearches: [],
         topSearches: [],
         selectedGender: 'women',
-        value: ''
+        value: '',
+        loading: false
     };
 
     async componentDidMount() {
@@ -66,10 +67,14 @@ class Home extends React.Component {
     }
 
     onChangeText = async (value) => {
+        this.setState({
+            loading: true
+        })
         const hits = await getSuggestions(this.state.selectedGender === 'all' ? value : `${genders[this.state.selectedGender].value} ${value}`);
         this.setState({
             value,
-            hits: hits || []
+            hits: hits || [],
+            loading: false
         })
     }
 
@@ -110,9 +115,6 @@ class Home extends React.Component {
         };
         if(query.toUpperCase().includes(brand_name.toUpperCase())) {
             params = {...params, brand_name};
-        }
-        if(this.state.selectedGender !== "all") {
-            params = {...params, ["categories.level0"]: this.state.selectedGender};
         }
         this.props.navigation.navigate('PLP', {
             params,
@@ -182,64 +184,69 @@ class Home extends React.Component {
                     />
                     <View style={{width: '100%', backgroundColor: 'grey', borderBottomLeftRadius: 10, borderBottomRightRadius: 10,}}>
                         {
-                            this.state.topSearches.length > 0 &&
-                                <View style={{padding: 10}}>
-                                    <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
-                                        Top Searches
-                                    </Text>
-                                    <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-                                    {
-                                        this.state.topSearches.map(ele => {
-                                            return (
-                                            <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
-                                                {ele.search}
+                            this.state.loading ? <ActivityIndicator color="white" size="large" style={{margin: 10}} /> :
+                            <>
+                                {
+                                    this.state.topSearches.length > 0 &&
+                                        <View style={{padding: 10}}>
+                                            <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
+                                                Top Searches
                                             </Text>
-                                            )
-                                        })
-                                    }
-                                    </View>
-                                </View>
-                        }
-                        {
-                            this.state.recentSearches.length > 0 &&
-                                <View style={{padding: 10}}>
-                                    <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
-                                        Recent Searches
-                                    </Text>
-                                    <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-                                    {
-                                    this.state.recentSearches.map(ele => {
+                                            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                                            {
+                                                this.state.topSearches.map(ele => {
+                                                    return (
+                                                    <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
+                                                        {ele.search}
+                                                    </Text>
+                                                    )
+                                                })
+                                            }
+                                            </View>
+                                        </View>
+                                }
+                                {
+                                    this.state.recentSearches.length > 0 &&
+                                        <View style={{padding: 10}}>
+                                            <Text style={{fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 10, }}>
+                                                Recent Searches
+                                            </Text>
+                                            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                                            {
+                                            this.state.recentSearches.map(ele => {
+                                                return (
+                                                <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
+                                                    {ele}
+                                                </Text>
+                                                )
+                                            })
+                                            }
+                                            </View>
+                                        </View>
+                                }
+                                {
+                                    this.state.hits.map(ele => {
                                         return (
-                                        <Text style={{color: 'yellow', textDecorationLine: 'underline', marginBottom: 10, marginRight: 10}}>
-                                            {ele}
-                                        </Text>
+                                            <TouchableOpacity 
+                                                style={{
+                                                padding: 10, 
+                                                borderBottomColor: '#fff', 
+                                                borderBottomWidth: 2,
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-between'
+                                            }} 
+                                            onPress={() => this.onSuggestionPress(ele)}>
+                                                <Text style={{fontSize: 18}}>
+                                                    {this.fomatQuery(ele.query)}
+                                                </Text>
+                                                <Text>
+                                                    {ele[sourceIndexName].exact_nb_hits}
+                                                </Text>
+                                            </TouchableOpacity>
                                         )
                                     })
-                                    }
-                                    </View>
-                                </View>
-                        }
-                        {
-                        this.state.hits.map(ele => {
-                            return (
-                                <TouchableOpacity 
-                                    style={{
-                                    padding: 10, 
-                                    borderBottomColor: '#fff', 
-                                    borderBottomWidth: 2,
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between'
-                                }} 
-                                onPress={() => this.onSuggestionPress(ele)}>
-                                    <Text style={{fontSize: 18}}>
-                                        {this.fomatQuery(ele.query)}
-                                    </Text>
-                                    <Text>
-                                        {ele[sourceIndexName].exact_nb_hits}
-                                    </Text>
-                                </TouchableOpacity>
-                            )
-                        })
+                                }
+                            </>
                         }
                     </View>
                 </View>
