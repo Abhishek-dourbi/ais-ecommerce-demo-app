@@ -4,10 +4,11 @@ import algoliasearch from 'algoliasearch/reactnative';
 import AlgoliaSDK from '@6thstreetdotcom/algolia-sdk';
 import { queryString } from './utils';
 
-const APPLICATION_ID = "testingYRFDV96GMU";
-const API_KEY = "13e0ed6aa0401c8eb3b7c08c72d90c20";
-export const indexName = "stage_magento_english_products_query_suggestions";
-export const sourceIndexName = "stage_magento_english_products";
+const APPLICATION_ID = "02X7U6O3SI";
+const API_KEY = "1585b8474aaca857f922d1888f76f38e";
+const SOURCE_INDEX_API_KEY = '1c1f24f9c49cbf42d872fcf91746fc21';
+export const indexName = "enterprise_magento_english_products_query_suggestions";
+export const sourceIndexName = "enterprise_magento_en_kw_products";
 
 const searchClient = algoliasearch(
   APPLICATION_ID,
@@ -61,7 +62,7 @@ export async function getTopSearches() {
   try {
     const res = await axios.get(`https://analytics.algolia.com/2/searches?index=${sourceIndexName}&limit=5&tags=mobile AND Search`, {
       headers: {
-        "X-Algolia-API-Key": API_KEY,
+        "X-Algolia-API-Key": SOURCE_INDEX_API_KEY,
         "X-Algolia-Application-Id": APPLICATION_ID,
       }, 
     })
@@ -79,7 +80,7 @@ export const algoliaSDK = {
   },
 
   setIndex: () => {
-    AlgoliaSDK.setIndex('en-ae', 'staging');
+    AlgoliaSDK.setIndex('en-ae', 'enterprise');
   },
 
   getPLP: async (params = {}, options = {}) => {
@@ -101,4 +102,4 @@ export const algoliaSDK = {
   getIndex: () => AlgoliaSDK.index
 };
 
-algoliaSDK.init(APPLICATION_ID, API_KEY);
+algoliaSDK.init(APPLICATION_ID, SOURCE_INDEX_API_KEY);

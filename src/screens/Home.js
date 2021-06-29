@@ -66,19 +66,23 @@ class Home extends React.Component {
         })
     }
 
-    checkForValidSuggestion = (value) => {
+    checkForValidSuggestion = (value, arr) => {
         let valid = true;
-        let {all, [this.state.selectedGender]: selectedGender, ...filters} = genders;
-        Object.keys(filters).forEach(filter => {
-            let regex = new RegExp("\\b" + filter + "\\b", "i");
-            if(regex.test(value)) {
-                valid = false;
-            }
-        })
+        if(this.state.selectedGender !== "all") {
+            let {all, [this.state.selectedGender]: selectedGender, ...filters} = genders;
+            Object.keys(filters).forEach(filter => {
+                let regex = new RegExp("\\b" + filter + "\\b", "i");
+                if(regex.test(value)) {
+                    valid = false;
+                }
+            })
+        }
+        let hit = arr.find(ele => ele.query.toUpperCase() === value.toUpperCase());
+        if(hit) valid = false;
         return valid;
     }
 
-    getHits = (hit) => {
+    getHits = (hit, resArray) => {
         console.log('hit', hit);
         let arr = [];
         let {all, [this.state.selectedGender]: selectedGender, ...filter} = genders;
@@ -106,7 +110,7 @@ class Home extends React.Component {
                 ]
             });
             categories_level1.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value)) {
+                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
                     arr.push({
                         query: brand_name[0].value + " " + ele.value.replaceAll('/// ', ''),
                         filter: [
@@ -123,7 +127,7 @@ class Home extends React.Component {
                 }
             });
             categories_level2.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value)) {
+                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
                     arr.push({
                         query: brand_name[0].value + " " + ele.value.replaceAll('/// ', ''),
                         filter: [
@@ -141,7 +145,7 @@ class Home extends React.Component {
             });
         } else {
             categories_level1.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value)) {
+                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
                     arr.push({
                         query: ele.value.replaceAll('/// ', ''),
                         filter: [
@@ -154,7 +158,7 @@ class Home extends React.Component {
                 }
             })
             categories_level2.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value)) {
+                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
                     arr.push({
                         query: ele.value.replaceAll('/// ', ''),
                         filter: [
@@ -166,15 +170,27 @@ class Home extends React.Component {
                     })
                 }
             })
-            arr.push({
-                query: brand_name[0].value + " " + query,
-                filter: [
-                    {
-                        type: 'brand',
-                        value: brand_name[0].value
-                    },
-                ]
-            })
+            if(this.checkForValidSuggestion(brand_name[0].value + " " + query, resArray)) {
+                arr.push({
+                    query: brand_name[0].value + " " + query,
+                    filter: [
+                        {
+                            type: 'brand',
+                            value: brand_name[0].value
+                        },
+                    ]
+                })
+            }
+        }
+        return arr;
+    }
+
+    createSuggestions = (hits) => {
+        let arr = [];
+        let i = 0;
+        while(arr.length < 5 && i < hits.length) {
+            arr.push(...this.getHits(hits[i], arr));
+            i++;
         }
         return arr;
     }
@@ -184,10 +200,10 @@ class Home extends React.Component {
             loading: true
         })
         const hits = await getSuggestions(this.state.selectedGender === 'all' ? value : `${genders[this.state.selectedGender].value} ${value}`);
-        const newHits = this.getHits(hits[0]);
+        const newHits = this.createSuggestions(hits);
         this.setState({
             value,
-            hits: [...newHits, ...hits.slice(1)] || [],
+            hits: newHits || [],
             loading: false
         }, () => console.log(this.state.hits))
     }
