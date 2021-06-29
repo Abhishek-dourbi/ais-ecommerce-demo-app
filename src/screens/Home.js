@@ -66,16 +66,130 @@ class Home extends React.Component {
         })
     }
 
+    checkForValidSuggestion = (value) => {
+        let valid = true;
+        let {all, [this.state.selectedGender]: selectedGender, ...filters} = genders;
+        Object.keys(filters).forEach(filter => {
+            let regex = new RegExp("\\b" + filter + "\\b", "i");
+            if(regex.test(value)) {
+                valid = false;
+            }
+        })
+        return valid;
+    }
+
+    getHits = (hit) => {
+        console.log('hit', hit);
+        let arr = [];
+        let {all, [this.state.selectedGender]: selectedGender, ...filter} = genders;
+        const { 
+            query,
+            [sourceIndexName]: { 
+                facets: { 
+                    exact_matches : {
+                        brand_name,
+                        "categories.level1": categories_level1,
+                        "categories.level2": categories_level2,
+                        "categories.level3": categories_level3
+                    }
+                } 
+            }
+        } = hit;
+        if(hit.query.toUpperCase().includes(brand_name[0].value.toUpperCase())) {
+            arr.push({
+                query,
+                filter: [
+                    {
+                        type: 'brand',
+                        value: brand_name[0].value
+                    }
+                ]
+            });
+            categories_level1.forEach(ele => {
+                if(this.checkForValidSuggestion(ele.value)) {
+                    arr.push({
+                        query: brand_name[0].value + " " + ele.value.replaceAll('/// ', ''),
+                        filter: [
+                            {
+                                type: 'brand',
+                                value: brand_name[0].value
+                            },
+                            {
+                                type: 'category_level1',
+                                value: ele.value
+                            },
+                        ]
+                    })
+                }
+            });
+            categories_level2.forEach(ele => {
+                if(this.checkForValidSuggestion(ele.value)) {
+                    arr.push({
+                        query: brand_name[0].value + " " + ele.value.replaceAll('/// ', ''),
+                        filter: [
+                            {
+                                type: 'brand',
+                                value: brand_name[0].value
+                            },
+                            {
+                                type: 'category_level2',
+                                value: ele.value
+                            },
+                        ]
+                    })
+                }
+            });
+        } else {
+            categories_level1.forEach(ele => {
+                if(this.checkForValidSuggestion(ele.value)) {
+                    arr.push({
+                        query: ele.value.replaceAll('/// ', ''),
+                        filter: [
+                            {
+                                type: 'category_level1',
+                                value: ele.value
+                            },
+                        ]
+                    })
+                }
+            })
+            categories_level2.forEach(ele => {
+                if(this.checkForValidSuggestion(ele.value)) {
+                    arr.push({
+                        query: ele.value.replaceAll('/// ', ''),
+                        filter: [
+                            {
+                                type: 'category_level2',
+                                value: ele.value
+                            },
+                        ]
+                    })
+                }
+            })
+            arr.push({
+                query: brand_name[0].value + " " + query,
+                filter: [
+                    {
+                        type: 'brand',
+                        value: brand_name[0].value
+                    },
+                ]
+            })
+        }
+        return arr;
+    }
+
     onChangeText = async (value) => {
         this.setState({
             loading: true
         })
         const hits = await getSuggestions(this.state.selectedGender === 'all' ? value : `${genders[this.state.selectedGender].value} ${value}`);
+        const newHits = this.getHits(hits[0]);
         this.setState({
             value,
-            hits: hits || [],
+            hits: [...newHits, ...hits.slice(1)] || [],
             loading: false
-        })
+        }, () => console.log(this.state.hits))
     }
 
     onPress = async(query) => {
@@ -107,14 +221,24 @@ class Home extends React.Component {
         }
     }
 
-    onSuggestionPress = ({query, ...rest}) => {
-        const brand_name = rest[sourceIndexName].facets.exact_matches.brand_name[0].value;
-        
+    onSuggestionPress = ({query, filter, ...rest}) => {
         let params = {
             q: query,
         };
-        if(query.toUpperCase().includes(brand_name.toUpperCase())) {
-            params = {...params, brand_name};
+
+        if(filter) {
+            filter.forEach(({type, value}) => {
+                if(type === "brand") {
+                    params = { ...params, brand_name: value }
+                } else if(type === "category_level1") {
+                    params = { ...params, ["categories.level1"]: value }
+                } else if(type === "category_level2") {
+                    params = { ...params, ["categories.level2"]: value }
+                }
+            })
+        }
+        if(this.state.selectedGender !== "all") {
+            params = { ...params, ["categories.level0"]: this.state.selectedGender }
         }
         this.props.navigation.navigate('PLP', {
             params,
@@ -123,14 +247,14 @@ class Home extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if(prevState.selectedGender !== this.state.selectedGender && this.state.value) {
+        if(prevState.selectedGender !== this.state.selectedGender && (this.state.value || this.state.hits.length)) {
             this.onChangeText(this.state.value);
         }
     }
 
     fomatQuery = (query) => {
         if(this.state.selectedGender === "all") return query;
-        let regex = new RegExp("\\b" + this.state.selectedGender + "\\b");
+        let regex = new RegExp("\\b" + this.state.selectedGender + "\\b", "i");
         return query.replace(regex, "").replace(/^\s+|\s+$/g, "").replace(/\s+/g, " ");
     }
 
@@ -225,7 +349,7 @@ class Home extends React.Component {
                                         </View>
                                 }
                                 {
-                                    this.state.hits.map(ele => {
+                                    this.state.hits.slice(0, 5).map(ele => {
                                         return (
                                             <TouchableOpacity 
                                                 style={{
@@ -240,7 +364,7 @@ class Home extends React.Component {
                                                     {this.fomatQuery(ele.query)}
                                                 </Text>
                                                 <Text>
-                                                    {ele[sourceIndexName].exact_nb_hits}
+                                                    {ele[sourceIndexName]?.exact_nb_hits || 0}
                                                 </Text>
                                             </TouchableOpacity>
                                         )
