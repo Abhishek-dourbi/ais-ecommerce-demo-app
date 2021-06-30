@@ -18,12 +18,12 @@ const searchClient = algoliasearch(
 const index = searchClient.initIndex(indexName);
 
 export async function getSuggestions(query) {
-  console.log(query);
+  console.log('query', query);
     try {
         const res = await index.search(query, {
           hitsPerPage: 5,
         })
-        console.log(res);
+        console.log('result', res);
         return res.hits;
     } catch(e) {
         console.log(e);

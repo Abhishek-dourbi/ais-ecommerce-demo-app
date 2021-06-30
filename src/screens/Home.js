@@ -68,6 +68,12 @@ class Home extends React.Component {
 
     checkForValidSuggestion = (value, arr) => {
         let valid = true;
+
+        let invalidKeywordsRegex = new RegExp("\\b" + "OUTLET|INFLUENCER|INFLUENCERS" + "\\b", "i");
+        if(invalidKeywordsRegex.test(value)) return false;
+
+        if(value.toUpperCase() === this.state.selectedGender.toUpperCase()) return false;
+        
         if(this.state.selectedGender !== "all") {
             let {all, [this.state.selectedGender]: selectedGender, ...filters} = genders;
             Object.keys(filters).forEach(filter => {
@@ -77,13 +83,13 @@ class Home extends React.Component {
                 }
             })
         }
-        let hit = arr.find(ele => ele.query.toUpperCase() === value.toUpperCase());
+        let hit = arr.find(ele => ele.query.replace(/[&-]/g, '').replace(/^\s+|\s+$/g, "").replace(/\s+/g, " ").toUpperCase().split(' ').sort().join(' ') === value.replace(/[&-]/g, '').replace(/^\s+|\s+$/g, "").replace(/\s+/g, " ").toUpperCase().split(' ').sort().join(' '));
+        // console.log(hit, arr, value);
         if(hit) valid = false;
         return valid;
     }
 
     getHits = (hit, resArray) => {
-        console.log('hit', hit);
         let arr = [];
         let {all, [this.state.selectedGender]: selectedGender, ...filter} = genders;
         const { 
@@ -99,18 +105,29 @@ class Home extends React.Component {
                 } 
             }
         } = hit;
+        let category;
+        let subCategory;
+        if(this.state.selectedGender === "kids") {
+            category = categories_level2.slice(0,1);
+            subCategory = categories_level3
+        } else {
+            category = categories_level1.slice(0,1);
+            subCategory = categories_level2;
+        }
         if(hit.query.toUpperCase().includes(brand_name[0].value.toUpperCase())) {
-            arr.push({
-                query,
-                filter: [
-                    {
-                        type: 'brand',
-                        value: brand_name[0].value
-                    }
-                ]
-            });
-            categories_level1.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
+            if(this.checkForValidSuggestion(query, [...resArray, ...arr])) {
+                arr.push({
+                    query,
+                    filter: [
+                        {
+                            type: 'brand',
+                            value: brand_name[0].value
+                        }
+                    ]
+                });
+            }
+            category.forEach(ele => {
+                if(this.checkForValidSuggestion(brand_name[0].value + " " + ele.value.replaceAll('/// ', ''), [...resArray, ...arr])) {
                     arr.push({
                         query: brand_name[0].value + " " + ele.value.replaceAll('/// ', ''),
                         filter: [
@@ -126,10 +143,11 @@ class Home extends React.Component {
                     })
                 }
             });
-            categories_level2.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
+            subCategory.forEach(ele => {
+                if(this.checkForValidSuggestion(brand_name[0].value + " " + ele.value.replaceAll('/// ', ''), [...resArray, ...arr])) {
+                    let val = ele.value.split(' /// ').reverse();
                     arr.push({
-                        query: brand_name[0].value + " " + ele.value.replaceAll('/// ', ''),
+                        query: brand_name[0].value + " " + val.join(' '),
                         filter: [
                             {
                                 type: 'brand',
@@ -144,8 +162,8 @@ class Home extends React.Component {
                 }
             });
         } else {
-            categories_level1.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
+            category.forEach(ele => {
+                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), [...resArray, ...arr])) {
                     arr.push({
                         query: ele.value.replaceAll('/// ', ''),
                         filter: [
@@ -157,10 +175,11 @@ class Home extends React.Component {
                     })
                 }
             })
-            categories_level2.forEach(ele => {
-                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), resArray)) {
+            subCategory.forEach(ele => {
+                if(this.checkForValidSuggestion(ele.value.replaceAll('/// ', ''), [...resArray, ...arr])) {
+                    let val = ele.value.split(' /// ').reverse();
                     arr.push({
-                        query: ele.value.replaceAll('/// ', ''),
+                        query: val.join(' '),
                         filter: [
                             {
                                 type: 'category_level2',
@@ -170,7 +189,7 @@ class Home extends React.Component {
                     })
                 }
             })
-            if(this.checkForValidSuggestion(brand_name[0].value + " " + query, resArray)) {
+            if(this.checkForValidSuggestion(brand_name[0].value + " " + query, [...resArray, ...arr])) {
                 arr.push({
                     query: brand_name[0].value + " " + query,
                     filter: [
@@ -181,6 +200,11 @@ class Home extends React.Component {
                     ]
                 })
             }
+        }
+        if(this.checkForValidSuggestion(query, [...resArray, ...arr])) {
+            arr.unshift({
+                query,
+            })
         }
         return arr;
     }
