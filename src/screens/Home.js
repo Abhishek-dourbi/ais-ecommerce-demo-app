@@ -231,8 +231,12 @@ class Home extends React.Component {
         this.setState({
             loading: true
         })
+        const defaultHit = {
+            query: value,
+            count: '-'
+        }
         const hits = await getSuggestions(this.state.selectedGender === 'all' ? value : `${genders[this.state.selectedGender].value} ${value}`);
-        const newHits = this.createSuggestions(hits);
+        const newHits = hits.length ? this.createSuggestions(hits) : [defaultHit];
         this.setState({
             value,
             hits: newHits || [],
