@@ -113,7 +113,7 @@ class Home extends React.Component {
         } = hit;
         let category;
         let subCategory;
-        if(this.state.selectedGender === "kids") {
+        if(query.includes("kids")) {
             category = categories_level2;
             subCategory = categories_level3
         } else {
