@@ -113,7 +113,15 @@ class Home extends React.Component {
         } = hit;
         let category;
         let subCategory;
-        if(query.includes("kids")) {
+        if(
+            query.toUpperCase().includes("KIDS") ||
+            query.toUpperCase().includes("GIRL") ||
+            query.toUpperCase().includes("GIRLS") ||
+            query.toUpperCase().includes("BOY") ||
+            query.toUpperCase().includes("BOYS") ||
+            query.toUpperCase().includes("BABY GIRL") || 
+            query.toUpperCase().includes("BABY BOY")
+        ) {
             category = categories_level2;
             subCategory = categories_level3
         } else {
@@ -315,7 +323,9 @@ class Home extends React.Component {
             query.toUpperCase().includes("GIRL") ||
             query.toUpperCase().includes("BOY") ||
             query.toUpperCase().includes("GIRLS") ||
-            query.toUpperCase().includes("BOYS")
+            query.toUpperCase().includes("BOYS") ||
+            query.toUpperCase().includes("BABY BOY") || 
+            query.toUpperCase().includes("BABY GIRL")
         ) avoidFilter = "kids"
         else if(this.state.selectedGender === "all") return query;
 
