@@ -69,10 +69,15 @@ class Home extends React.Component {
     checkForValidSuggestion = (value, arr) => {
         let valid = true;
 
-        let invalidKeywordsRegex = new RegExp("\\b" + "OUTLET|INFLUENCER|INFLUENCERS" + "\\b", "i");
-        if(invalidKeywordsRegex.test(value)) return false;
+        if(/\b(?:OUTLET|INFLUENCER|INFLUENCERS)\b/i.test(value)) return false;
 
-        if(value.toUpperCase() === this.state.selectedGender.toUpperCase()) return false;
+        if(
+            value.toUpperCase() === this.state.selectedGender.toUpperCase() ||
+            value.toUpperCase() === "KIDS BABY GIRL" ||
+            value.toUpperCase() === "KIDS GIRL" || 
+            value.toUpperCase() === "KIDS BOY" || 
+            value.toUpperCase() === "KIDS BABY BOY"
+        ) return false;
         
         if(this.state.selectedGender !== "all") {
             let {all, [this.state.selectedGender]: selectedGender, ...filters} = genders;
@@ -305,8 +310,16 @@ class Home extends React.Component {
     }
 
     fomatQuery = (query) => {
-        if(this.state.selectedGender === "all") return query;
-        let regex = new RegExp("\\b" + this.state.selectedGender + "\\b", "i");
+        let avoidFilter = this.state.selectedGender;
+        if(
+            query.toUpperCase().includes("GIRL") ||
+            query.toUpperCase().includes("BOY") ||
+            query.toUpperCase().includes("GIRLS") ||
+            query.toUpperCase().includes("BOYS")
+        ) avoidFilter = "kids"
+        else if(this.state.selectedGender === "all") return query;
+
+        let regex = new RegExp("\\b" + avoidFilter + "\\b", "i");
         return query.replace(regex, "").replace(/^\s+|\s+$/g, "").replace(/\s+/g, " ");
     }
 
