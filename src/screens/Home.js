@@ -95,6 +95,7 @@ class Home extends React.Component {
         const { 
             query,
             [sourceIndexName]: { 
+                exact_nb_hits,
                 facets: { 
                     exact_matches : {
                         brand_name,
@@ -108,10 +109,10 @@ class Home extends React.Component {
         let category;
         let subCategory;
         if(this.state.selectedGender === "kids") {
-            category = categories_level2.slice(0,1);
+            category = categories_level2;
             subCategory = categories_level3
         } else {
-            category = categories_level1.slice(0,1);
+            category = categories_level1;
             subCategory = categories_level2;
         }
         if(hit.query.toUpperCase().includes(brand_name[0].value.toUpperCase())) {
@@ -123,7 +124,8 @@ class Home extends React.Component {
                             type: 'brand',
                             value: brand_name[0].value
                         }
-                    ]
+                    ],
+                    count: brand_name[0].count
                 });
             }
             category.forEach(ele => {
@@ -139,7 +141,8 @@ class Home extends React.Component {
                                 type: 'category_level1',
                                 value: ele.value
                             },
-                        ]
+                        ],
+                        count: ele.count
                     })
                 }
             });
@@ -157,7 +160,8 @@ class Home extends React.Component {
                                 type: 'category_level2',
                                 value: ele.value
                             },
-                        ]
+                        ],
+                        count: ele.count
                     })
                 }
             });
@@ -171,7 +175,8 @@ class Home extends React.Component {
                                 type: 'category_level1',
                                 value: ele.value
                             },
-                        ]
+                        ],
+                        count: ele.count
                     })
                 }
             })
@@ -185,7 +190,8 @@ class Home extends React.Component {
                                 type: 'category_level2',
                                 value: ele.value
                             },
-                        ]
+                        ],
+                        count: ele.count
                     })
                 }
             })
@@ -197,13 +203,15 @@ class Home extends React.Component {
                             type: 'brand',
                             value: brand_name[0].value
                         },
-                    ]
+                    ],
+                    count: brand_name[0].count
                 })
             }
         }
         if(this.checkForValidSuggestion(query, [...resArray, ...arr])) {
             arr.unshift({
                 query,
+                count: exact_nb_hits
             })
         }
         return arr;
@@ -404,7 +412,7 @@ class Home extends React.Component {
                                                     {this.fomatQuery(ele.query)}
                                                 </Text>
                                                 <Text>
-                                                    {ele[sourceIndexName]?.exact_nb_hits || 0}
+                                                    {ele.count || 0}
                                                 </Text>
                                             </TouchableOpacity>
                                         )
